@@ -13,18 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PlaceholderResolverParams } from '@backstage/plugin-catalog-backend';
+import { PlaceholderResolverParams } from '@backstage/plugin-catalog-node';
 import { JsonValue } from '@backstage/types';
 import { processingResult } from '@backstage/plugin-catalog-node';
 import { bundleFileWithRefs } from './lib';
+
+type OpenApiDefinition = {
+  location: string;
+  locationVariables: Record<string, string>;
+};
 
 /** @public */
 export async function jsonSchemaRefPlaceholderResolver(
   params: PlaceholderResolverParams,
 ): Promise<JsonValue> {
+  let value = undefined;
+  if (typeof params.value !== 'string') {
+    value = params.value?.valueOf() as OpenApiDefinition;
+    params.value = value.location;
+  }
   const { content, url } = await readTextLocation(params);
 
   params.emit(processingResult.refresh(`url:${url}`));
+
+  // console.log(params)
 
   try {
     return await bundleFileWithRefs(
@@ -32,6 +44,7 @@ export async function jsonSchemaRefPlaceholderResolver(
       url,
       params.read,
       params.resolveUrl,
+      value?.locationVariables,
     );
   } catch (error) {
     throw new Error(
