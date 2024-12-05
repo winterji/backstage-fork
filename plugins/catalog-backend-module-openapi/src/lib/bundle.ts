@@ -63,7 +63,7 @@ export async function bundleFileWithRefs(
       if (mappedLocations) {
         for (const key in mappedLocations) {
           if (urlPom.endsWith(key)) {
-            console.log(`------- Found known location for: ${key}`);
+            // console.log(`------- Found known location for: ${key}`);
             urlPom = mappedLocations[
               key as keyof typeof mappedLocations
             ] as string;
@@ -86,21 +86,7 @@ export async function bundleFileWithRefs(
     },
   };
 
-  console.log(mappedLocations);
-
   const fileObject = parse(fileWithRefs);
-
-  // const resolved = await $RefParser.resolve(baseUrl, fileObject, options)
-  // console.log("resolved paths:")
-  // console.log(resolved.paths())
-  // console.log("resolved values:")
-  // console.log(resolved.values(["file", "http"]))
-
-  // console.log("baseUrl before bundle: " + baseUrl)
-  // console.log("before bundle:")
-  // console.log(fileObject.paths['/v1/calculate-points'].post.responses);
   const bundledObject = await $RefParser.bundle(baseUrl, fileObject, options);
-  // console.log('after bundle:');
-  // console.log(bundledObject);
   return stringify(bundledObject);
 }
